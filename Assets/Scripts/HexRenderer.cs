@@ -144,4 +144,9 @@ public class HexRenderer : MonoBehaviour
         material = newMaterial;
         m_meshRenderer.material = newMaterial;
     }
+
+    public void SetColor(Color newColor)
+    {
+        m_meshRenderer.material.SetColor("_Color", newColor);
+    }
 }

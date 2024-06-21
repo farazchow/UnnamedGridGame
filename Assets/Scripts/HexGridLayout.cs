@@ -13,13 +13,13 @@ public class HexGridLayout : MonoBehaviour
     public float height = 1f;
     public bool isFlatTopped;
     public Material material;
-    private bool isFirstRender = true;
-
-    // private void OnEnable()
-    // {
-    //     LayoutGrid();
-    // }
-
+    
+    public bool useRandomHeights;
+    public float minimumHeight = 1f;
+    public float maximumHeight = 3f;
+    public float noiseFrequency = 1.5f;
+    public bool useRandomColors;
+    
     private void OnValidate()
     {
         if (Application.isPlaying)
@@ -48,8 +48,23 @@ public class HexGridLayout : MonoBehaviour
                 hexRenderer.isFlatTopped = isFlatTopped;
                 hexRenderer.outerSize = outerSize;
                 hexRenderer.innerSize = innerSize;
-                hexRenderer.height = height;
+
+                if (useRandomHeights)
+                {
+                    float newHeight = (Mathf.PerlinNoise(noiseFrequency * x, noiseFrequency * y) * maximumHeight) - minimumHeight;
+                    print(newHeight);
+                    hexRenderer.height = newHeight;
+                }
+                else
+                {
+                    hexRenderer.height = height;
+                }
                 hexRenderer.SetMaterial(material);
+                if (useRandomColors)
+                {
+                    hexRenderer.SetColor(Random.ColorHSV());
+                }
+
                 hexRenderer.DrawMesh();
                 tile.transform.SetParent(transform, false);
             }
