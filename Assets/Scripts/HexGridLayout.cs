@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class HexGridLayout : MonoBehaviour
 {
@@ -10,16 +12,26 @@ public class HexGridLayout : MonoBehaviour
     [Header("Tile Settings")]
     public float outerSize = 1f;
     public float innerSize = 0f;
-    public float height = 1f;
     public bool isFlatTopped;
     public Material material;
     
-    public bool useRandomHeights;
     public float minimumHeight = 1f;
-    public float maximumHeight = 3f;
-    public float noiseFrequency = 1.5f;
-    public bool useRandomColors;
+    public float maximumHeight = 10f;
+    public float noiseFrequency = 4f;
+    public int octaves = 2;
     
+    public int waterHeight = 3;
+    public int landHeightCeiling = 6;
+    public int MountainCeiling = 8;
+    public bool useGreyScale;
+
+    public Dictionary<string, Color> ColorMap = new Dictionary<string, Color>(){
+        {"Water", Color.blue},
+        {"Land", Color.green},
+        {"Mountain", Color.gray},
+        {"Snow", Color.white}
+    };
+
     private void OnValidate()
     {
         if (Application.isPlaying)
@@ -36,6 +48,9 @@ public class HexGridLayout : MonoBehaviour
 
     private void LayoutGrid()
     {
+        float maxHeightSeen = 0;
+        float minHeightSeen = Mathf.Pow(2, octaves);
+
         for (int y = 0; y < gridSize.y; y++)
         {
             for (int x = 0; x < gridSize.x; x++)
@@ -43,32 +58,62 @@ public class HexGridLayout : MonoBehaviour
                 GameObject tile = new GameObject($"Hex {x}, {y}", typeof(HexRenderer));
                 tile.transform.position = GetPositionForHexFromCoordinate(new Vector2Int(x, y));
 
-
                 HexRenderer hexRenderer = tile.GetComponent<HexRenderer>();
                 hexRenderer.isFlatTopped = isFlatTopped;
                 hexRenderer.outerSize = outerSize;
                 hexRenderer.innerSize = innerSize;
+                
+                float nx = (float)(x/((float) gridSize.x));
+                float ny = (float)(y/((float) gridSize.y));
+                print($"nx is {nx} and ny is {ny}, x = {x}");
 
-                if (useRandomHeights)
+                float heightCoefficient = getHeightCoefficient(nx, ny);
+                float height = Mathf.Round(heightCoefficient * (maximumHeight - minimumHeight)) + minimumHeight;
+
+                string tileType = GetTileTypeFromHeight(height);
+                if (tileType == "Water")
                 {
-                    float newHeight = (Mathf.PerlinNoise(noiseFrequency * x, noiseFrequency * y) * maximumHeight) - minimumHeight;
-                    print(newHeight);
-                    hexRenderer.height = newHeight;
+                    height = waterHeight;
+                }
+
+
+                // Debugging
+                maxHeightSeen = Mathf.Max(maxHeightSeen, heightCoefficient);
+                minHeightSeen = Mathf.Min(minHeightSeen, heightCoefficient);
+
+                hexRenderer.height = height;
+                hexRenderer.SetMaterial(material);
+
+                if (useGreyScale)
+                {
+                    hexRenderer.SetColor(Color.HSVToRGB(0, 0, 1-heightCoefficient));
                 }
                 else
                 {
-                    hexRenderer.height = height;
-                }
-                hexRenderer.SetMaterial(material);
-                if (useRandomColors)
-                {
-                    hexRenderer.SetColor(Random.ColorHSV());
+                    hexRenderer.SetColor(ColorMap[tileType]);
                 }
 
                 hexRenderer.DrawMesh();
                 tile.transform.SetParent(transform, false);
             }
         }
+
+        print(maxHeightSeen);
+        print(minHeightSeen);
+    }
+
+    private float getHeightCoefficient(float nx, float ny)
+    {
+        float heightCoefficient = 0;
+        float oSum = 0;
+
+        for (int octave = 0; octave < octaves ; octave++)
+        {
+            float o = Mathf.Pow(2f, octave);
+            heightCoefficient +=  Mathf.PerlinNoise(noiseFrequency * o * nx, noiseFrequency * o * ny) / o;
+            oSum += 1/o;
+        }
+        return heightCoefficient/oSum;
     }
 
     private Vector3 GetPositionForHexFromCoordinate(Vector2Int coordinate)
@@ -117,5 +162,15 @@ public class HexGridLayout : MonoBehaviour
 
         return new Vector3(xPosition, 0, -yPosition);
 
+    }
+
+    private String GetTileTypeFromHeight(float height) 
+    {
+        int height_int = (int) height;
+
+        if (height_int <= waterHeight) {return "Water";}
+        else if (height_int <= landHeightCeiling) {return "Land";}
+        else if (height_int <= MountainCeiling) {return "Mountain";}
+        else {return "Snow";}
     }
 }

@@ -70,19 +70,19 @@ public class HexRenderer : MonoBehaviour
         // Top Faces
         for (int point = 0; point < 6; point++) 
         {
-            m_faces.Add(CreateFace(innerSize, outerSize, height / 2f, height / 2f, point));
+            m_faces.Add(CreateFace(innerSize, outerSize, height, height, point));
         }
 
         // Bottom Faces
         for (int point = 0; point < 6; point++) 
         {
-            m_faces.Add(CreateFace(innerSize, outerSize, -height / 2f, -height / 2f, point, true));
+            m_faces.Add(CreateFace(innerSize, outerSize, 0, 0, point, true));
         }
 
         // Outer faces
         for (int point = 0; point < 6; point++)
         {
-            m_faces.Add(CreateFace(outerSize, outerSize, height / 2f, -height / 2f, point, true));
+            m_faces.Add(CreateFace(outerSize, outerSize, height, 0, point, true));
         }
         
     }
