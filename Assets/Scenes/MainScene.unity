@@ -367,14 +367,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 590298969}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.38268343, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 651513463}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &651513462
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,7 +402,7 @@ Transform:
   m_GameObject: {fileID: 651513462}
   serializedVersion: 2
   m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 50, z: -50}
+  m_LocalPosition: {x: 0, y: 250, z: -250}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -503,6 +503,7 @@ MonoBehaviour:
   outerSize: 2
   height: 2
   isFlatTopped: 0
+  tileType: 0
 --- !u!23 &943515625
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -597,19 +598,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad7856616f169b443a026bf2c334f44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: {x: 25, y: 25}
+  gridSize: {x: 50, y: 50}
   outerSize: 1
   innerSize: 0
   isFlatTopped: 0
   material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   minimumHeight: 1
-  maximumHeight: 10
+  maximumHeight: 14
   noiseFrequency: 4
   octaves: 2
-  waterHeight: 4
-  landHeightCeiling: 6
-  MountainCeiling: 8
   useGreyScale: 0
+  xOffset: 0
+  yOffset: 0
 --- !u!4 &1902727508
 Transform:
   m_ObjectHideFlags: 0
@@ -619,7 +619,7 @@ Transform:
   m_GameObject: {fileID: 1902727506}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 25, y: 0, z: 25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

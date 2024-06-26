@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public struct Face
@@ -31,6 +32,7 @@ public class HexRenderer : MonoBehaviour
     public float outerSize;
     public float height;
     public bool isFlatTopped;
+    public TileTypes tileType;
 
     private void Awake()
     {
@@ -59,6 +61,7 @@ public class HexRenderer : MonoBehaviour
 
     public void DrawMesh()
     {
+        SetTileType();
         DrawFaces();
         CombineFaces();
     }
@@ -148,5 +151,16 @@ public class HexRenderer : MonoBehaviour
     public void SetColor(Color newColor)
     {
         m_meshRenderer.material.SetColor("_Color", newColor);
+    }
+
+    private void SetTileType()
+    {   
+        Biomes biomes = new Biomes();
+        tileType = biomes.GetTileTypeFromHeight(height);
+        if (tileType == TileTypes.Water)
+        {
+            height = biomes.waterHeight;
+        }
+        SetColor(Biomes.ColorMap[tileType]);
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
-
 
 public class HexGridLayout : MonoBehaviour
 {
@@ -19,18 +19,17 @@ public class HexGridLayout : MonoBehaviour
     public float maximumHeight = 10f;
     public float noiseFrequency = 4f;
     public int octaves = 2;
-    
-    public int waterHeight = 3;
-    public int landHeightCeiling = 6;
-    public int MountainCeiling = 8;
+
     public bool useGreyScale;
 
-    public Dictionary<string, Color> ColorMap = new Dictionary<string, Color>(){
-        {"Water", Color.blue},
-        {"Land", Color.green},
-        {"Mountain", Color.gray},
-        {"Snow", Color.white}
-    };
+    public float xOffset;
+    public float yOffset;
+
+    private void Start()
+    {
+        xOffset = UnityEngine.Random.Range(-1000, 1000);
+        yOffset = UnityEngine.Random.Range(-1000, 1000);
+    }
 
     private void OnValidate()
     {
@@ -48,9 +47,6 @@ public class HexGridLayout : MonoBehaviour
 
     private void LayoutGrid()
     {
-        float maxHeightSeen = 0;
-        float minHeightSeen = Mathf.Pow(2, octaves);
-
         for (int y = 0; y < gridSize.y; y++)
         {
             for (int x = 0; x < gridSize.x; x++)
@@ -65,41 +61,21 @@ public class HexGridLayout : MonoBehaviour
                 
                 float nx = (float)(x/((float) gridSize.x));
                 float ny = (float)(y/((float) gridSize.y));
-                print($"nx is {nx} and ny is {ny}, x = {x}");
 
                 float heightCoefficient = getHeightCoefficient(nx, ny);
-                float height = Mathf.Round(heightCoefficient * (maximumHeight - minimumHeight)) + minimumHeight;
-
-                string tileType = GetTileTypeFromHeight(height);
-                if (tileType == "Water")
-                {
-                    height = waterHeight;
-                }
-
-
-                // Debugging
-                maxHeightSeen = Mathf.Max(maxHeightSeen, heightCoefficient);
-                minHeightSeen = Mathf.Min(minHeightSeen, heightCoefficient);
+                float height = Mathf.Round(heightCoefficient * (maximumHeight + 1 - minimumHeight)) + minimumHeight;
 
                 hexRenderer.height = height;
                 hexRenderer.SetMaterial(material);
 
+                hexRenderer.DrawMesh();
                 if (useGreyScale)
                 {
                     hexRenderer.SetColor(Color.HSVToRGB(0, 0, 1-heightCoefficient));
                 }
-                else
-                {
-                    hexRenderer.SetColor(ColorMap[tileType]);
-                }
-
-                hexRenderer.DrawMesh();
                 tile.transform.SetParent(transform, false);
             }
         }
-
-        print(maxHeightSeen);
-        print(minHeightSeen);
     }
 
     private float getHeightCoefficient(float nx, float ny)
@@ -110,7 +86,7 @@ public class HexGridLayout : MonoBehaviour
         for (int octave = 0; octave < octaves ; octave++)
         {
             float o = Mathf.Pow(2f, octave);
-            heightCoefficient +=  Mathf.PerlinNoise(noiseFrequency * o * nx, noiseFrequency * o * ny) / o;
+            heightCoefficient +=  Mathf.PerlinNoise(noiseFrequency * o * nx + xOffset, noiseFrequency * o * ny + yOffset) / o;
             oSum += 1/o;
         }
         return heightCoefficient/oSum;
@@ -162,15 +138,5 @@ public class HexGridLayout : MonoBehaviour
 
         return new Vector3(xPosition, 0, -yPosition);
 
-    }
-
-    private String GetTileTypeFromHeight(float height) 
-    {
-        int height_int = (int) height;
-
-        if (height_int <= waterHeight) {return "Water";}
-        else if (height_int <= landHeightCeiling) {return "Land";}
-        else if (height_int <= MountainCeiling) {return "Mountain";}
-        else {return "Snow";}
     }
 }
